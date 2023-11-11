@@ -1,0 +1,38 @@
+﻿<Window x:Class="ShinyHuntCounterDesktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ShinyHuntCounterDesktop"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid Margin="5 0 5 5">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Vertical" MinWidth="150">
+                    <Label>Capture boundaries:</Label>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>X:</Label>
+                        <TextBox x:Name="XCoTextBox" HorizontalAlignment="Left" TextChanged="XCoTextChanged" VerticalAlignment="Center">0</TextBox>
+                        <Label >Y:</Label>
+                        <TextBox x:Name="YCoTextBox" VerticalAlignment="Center" TextChanged="YCoTextChanged">0</TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Width:</Label>
+                        <TextBox x:Name="WidthTextBox" VerticalAlignment="Center" TextChanged="WidthTextChanged">300</TextBox>
+                        <Label>Height:</Label>
+                        <TextBox x:Name="HeightTextBox" VerticalAlignment="Center" TextChanged="HeightTextChanged">100</TextBox>
+                    </StackPanel>
+                </StackPanel>
+                <Image x:Name="CapturedImage" Height="auto" Width="100"></Image>
+            </StackPanel>
+            
+            <Button>Start</Button>
+            <StackPanel Orientation="Horizontal">
+                <Label>Resets:</Label>
+                <TextBlock x:Name="ResetsTextBlock" VerticalAlignment="Center" FontWeight="Bold">0</TextBlock>
+            </StackPanel>
+            
+        </StackPanel>
+    </Grid>
+</Window>
