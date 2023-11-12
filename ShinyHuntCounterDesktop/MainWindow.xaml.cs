@@ -1,98 +1,144 @@
-﻿using ShinyHuntCounterDesktop.RG;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
+using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
+using OpenCvSharp.Extensions;
+using ShinyHuntCounterDesktop.CV;
+using ShinyHuntCounterDesktop.RG;
 
-namespace ShinyHuntCounterDesktop
+namespace ShinyHuntCounterDesktop;
+
+/// <summary>
+///     Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    private static int MAX_FRAMERATE = 60;
+
+    private readonly int height = 100;
+    private readonly ScreenRecorder srec;
+    private readonly Stalker stalker;
+    private readonly int width = 100;
+
+    private readonly int x = 0;
+    private readonly int y = 0;
+
+    public MainWindow()
     {
-        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-        public static extern bool DeleteObject(IntPtr hObject);
-
-        int x = 0, y = 0;
-        int width = 100, height = 100;
-        ScreenRecorder srec;
-
-        public MainWindow()
+        InitializeComponent();
+        stalker = new Stalker();
+        srec = new ScreenRecorder(x, y, width, height, bmp =>
         {
-            InitializeComponent();
-            srec = new ScreenRecorder(x,y,width,height,((bmp) =>
-            {
+            var onBattle = stalker.IsOnBattle(x, y, width, height, bmp);
+            //DisplayCapture(bmp);
+            DisplayTemplate(stalker.pokeMat.ToBitmap());
+            DisplayCapture(bmp);
+            DisplayOnBattle(onBattle);
 
-                Dispatcher.Invoke(() =>
-                {
-                        IntPtr hBitmap = bmp.GetHbitmap();
-                        try
-                        {
-                            var i = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty,
-                                                BitmapSizeOptions.FromEmptyOptions());
-                             CapturedImage.Source = i;
-                        }
-                        finally
-                        {
-                            DeleteObject(hBitmap);
-                        }
-                });
-            }));
-            new Thread(() =>
+
+
+        });
+
+        new Thread(() =>
+        {
+            while (true)
             {
-                while (true) { 
+                var watch = System.Diagnostics.Stopwatch.StartNew();
                 srec.run();
+                watch.Stop();
+                var elapsedMs = watch.ElapsedMilliseconds;
+                var timeToSleep = 1000 / MAX_FRAMERATE - elapsedMs;
+                if (timeToSleep>=0)
+                {
+                    Thread.Sleep((int)timeToSleep);
                 }
-            }).Start();
-        }
-        
-        private void YCoTextChanged(object sender, TextChangedEventArgs args)
+                else
+                {
+                    Debug.WriteLine(1000/ elapsedMs);
+                }
+
+            }
+        }).Start();
+    }
+
+    [DllImport("gdi32.dll")]
+    public static extern bool DeleteObject(IntPtr hObject);
+
+    private void DisplayTemplate(Bitmap bmp)
+    {
+        Dispatcher.Invoke(() =>
         {
-            if (srec == null) return;
-            int x = 0;
-            if (!Int32.TryParse(YCoTextBox.Text, out x)) return;
-            srec.SetY(x);
-     
-        }
-        private void XCoTextChanged(object sender, TextChangedEventArgs args)
+            var hBitmap = bmp.GetHbitmap();
+            try
+            {
+                var i = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions());
+                TemplateImage.Source = i;
+            }
+            finally
+            {
+                DeleteObject(hBitmap);
+            }
+        });
+    }
+
+    private void DisplayCapture(Bitmap bmp)
+    {
+        Dispatcher.Invoke(() =>
         {
-            if (srec == null) return;
-            int x = 0;
-            if (!Int32.TryParse(XCoTextBox.Text, out x)) return;
-            srec.SetX(x);
-            srec.run();
-        }
-        private void WidthTextChanged(object sender, TextChangedEventArgs args)
-        {
-            if (srec == null) return;
-            int x = 0;
-            if (!Int32.TryParse(WidthTextBox.Text, out x)) return;
-            srec.SetWidth(x);
- 
-        }
-        private void HeightTextChanged(object sender, TextChangedEventArgs args)
-        {
-            if (srec == null) return;
-            int x = 0;
-            if (!Int32.TryParse(HeightTextBox.Text, out x)) return;
-            srec.SetHeight(x);
-  
-        }
+            var hBitmap = bmp.GetHbitmap();
+            try
+            {
+                var i = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions());
+                CapturedImage.Source = i;
+            }
+            finally
+            {
+                DeleteObject(hBitmap);
+            }
+        });
+    }
+
+    private void DisplayOnBattle(bool isOnBattle)
+    {
+        Dispatcher.Invoke(() => { IsOnBattleCheckbox.IsChecked = isOnBattle; });
+    }
+
+    private void YCoTextChanged(object sender, TextChangedEventArgs args)
+    {
+        if (srec == null) return;
+        var x = 0;
+        if (!int.TryParse(YCoTextBox.Text, out x)) return;
+        srec.SetY(x);
+    }
+
+    private void XCoTextChanged(object sender, TextChangedEventArgs args)
+    {
+        if (srec == null) return;
+        var x = 0;
+        if (!int.TryParse(XCoTextBox.Text, out x)) return;
+        srec.SetX(x);
+    }
+
+    private void WidthTextChanged(object sender, TextChangedEventArgs args)
+    {
+        if (srec == null) return;
+        var x = 0;
+        if (!int.TryParse(WidthTextBox.Text, out x)) return;
+        srec.SetWidth(x);
+    }
+
+    private void HeightTextChanged(object sender, TextChangedEventArgs args)
+    {
+        if (srec == null) return;
+        var x = 0;
+        if (!int.TryParse(HeightTextBox.Text, out x)) return;
+        srec.SetHeight(x);
     }
 }

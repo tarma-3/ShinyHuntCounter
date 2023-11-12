@@ -38,8 +38,6 @@ namespace ShinyHuntCounterDesktop.RG
             Graphics g = Graphics.FromImage(bmp);
             g.CopyFromScreen(rect.Left, rect.Top, 0, 0, bmp.Size, CopyPixelOperation.SourceCopy);
             callback(bmp);
-
-
             g.Dispose();
             bmp.Dispose();
         }

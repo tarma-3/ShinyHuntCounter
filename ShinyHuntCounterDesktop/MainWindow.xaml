@@ -24,10 +24,13 @@
                         <TextBox x:Name="HeightTextBox" VerticalAlignment="Center" TextChanged="HeightTextChanged">100</TextBox>
                     </StackPanel>
                 </StackPanel>
+                <Image x:Name="TemplateImage" Height="auto" Width="100"></Image>
                 <Image x:Name="CapturedImage" Height="auto" Width="100"></Image>
+
             </StackPanel>
             
             <Button>Start</Button>
+            <CheckBox x:Name="IsOnBattleCheckbox" IsEnabled="False"></CheckBox>
             <StackPanel Orientation="Horizontal">
                 <Label>Resets:</Label>
                 <TextBlock x:Name="ResetsTextBlock" VerticalAlignment="Center" FontWeight="Bold">0</TextBlock>
