@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using OpenCvSharp.XFeatures2D;
 using Point = OpenCvSharp.Point;
 using Size = OpenCvSharp.Size;
 
@@ -80,11 +81,12 @@ namespace ShinyHuntCounterDesktop.CV
             var boundingRect = Cv2.BoundingRect(l);
             using Mat src = new Mat(src0, boundingRect);
             using Mat refMat = src.CvtColor(ColorConversionCodes.BGR2GRAY);
+           
+            var count  = ExtractImage(src, refMat, pokeMat).Count;
+           //var count = Matcher.FindMatches( src, pokeMat); (doesn't work...)
+           Debug.WriteLine("Matches: "+count);
 
-            var match = ExtractImage(src, refMat, pokeMat);
-            Debug.WriteLine(match.Count);
-
-            return true;
+            return count > 0;
         }
     }
 }

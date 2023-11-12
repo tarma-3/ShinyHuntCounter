@@ -29,6 +29,10 @@ namespace ShinyHuntCounterDesktop.RG
         int width = 100, height = 100;
         public ScreenRecorder(int x, int y, int width, int height, Action<Bitmap> onScreenshotTaken){
             this.callback = onScreenshotTaken;
+            this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
         }
 
         public void run()

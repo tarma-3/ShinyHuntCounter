@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ShinyHuntCounterDesktop"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Shiny Counter" ResizeMode="NoResize" Height="165" Width="360">
     <Grid Margin="5 0 5 5">
         <StackPanel>
             <StackPanel Orientation="Horizontal">
@@ -28,14 +28,13 @@
                 <Image x:Name="CapturedImage" Height="auto" Width="100"></Image>
 
             </StackPanel>
-            
-            <Button>Start</Button>
-            <CheckBox x:Name="IsOnBattleCheckbox" IsEnabled="False"></CheckBox>
+
+            <CheckBox x:Name="IsOnBattleCheckbox" IsEnabled="False">Battle</CheckBox>
             <StackPanel Orientation="Horizontal">
                 <Label>Resets:</Label>
-                <TextBlock x:Name="ResetsTextBlock" VerticalAlignment="Center" FontWeight="Bold">0</TextBlock>
+                <TextBox x:Name="ResetsTextBlock" VerticalAlignment="Center" FontWeight="Bold">0</TextBox>
             </StackPanel>
-            
         </StackPanel>
+        <Label FontSize="9" VerticalAlignment="Bottom" HorizontalAlignment="Right">(Shittly) Made with love for LobosJR by tarma-3</Label>
     </Grid>
 </Window>

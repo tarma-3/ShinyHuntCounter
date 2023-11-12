@@ -20,25 +20,41 @@ public partial class MainWindow : Window
 {
     private static int MAX_FRAMERATE = 60;
 
-    private readonly int height = 100;
+    private readonly int height = 400;
     private readonly ScreenRecorder srec;
     private readonly Stalker stalker;
-    private readonly int width = 100;
+    private readonly int width = 600;
 
     private readonly int x = 0;
     private readonly int y = 0;
-
+    private int persistentResultFrameCount = 0;
+    private bool oldOnBattleVar = false;
     public MainWindow()
     {
         InitializeComponent();
         stalker = new Stalker();
+  
         srec = new ScreenRecorder(x, y, width, height, bmp =>
         {
+            
             var onBattle = stalker.IsOnBattle(x, y, width, height, bmp);
+            if (onBattle == oldOnBattleVar)
+            {
+                if (persistentResultFrameCount++ == 5)
+                {
+                    DisplayOnBattle(onBattle);
+                    if (onBattle) UpdateAttempts();
+                }
+            }
+            else persistentResultFrameCount = 0;
+            
+            oldOnBattleVar = onBattle;
+            
+
+
             //DisplayCapture(bmp);
             DisplayTemplate(stalker.pokeMat.ToBitmap());
             DisplayCapture(bmp);
-            DisplayOnBattle(onBattle);
 
 
 
@@ -64,6 +80,17 @@ public partial class MainWindow : Window
 
             }
         }).Start();
+    }
+
+    private void UpdateAttempts()
+    {
+        Dispatcher.Invoke(() =>
+        {
+            var text = ResetsTextBlock.Text;
+            var x = 0;
+            if (!int.TryParse(text, out x)) return;
+            ResetsTextBlock.Text = (++x).ToString();
+        });
     }
 
     [DllImport("gdi32.dll")]
